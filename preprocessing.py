@@ -36,9 +36,8 @@ def make_window_for_multistep_LSTM(sequence, n_steps_in, n_steps_out):
         out_end = end + n_steps_out
         if out_end > len(sequence):
             break
-        seq_x, seq_y = sequence[i:end], sequence[end:out_end]
-        x.append(seq_x)
-        y.append(seq_y)
+        x.append(sequence[i:end])
+        y.append(sequence[end:out_end])
     return np.array(x), np.array(y)
 
 def make_window_for_seq2seq(data, n_steps_out):
@@ -47,6 +46,33 @@ def make_window_for_seq2seq(data, n_steps_out):
     for i in range(len(data)):
         x.append(data[i][0:-n_steps_out])
         y.append(data[i][-n_steps_out:])
+    return np.array(x), np.array(y)
+
+def make_window_for_seq2seq_v2(data, n_steps_in, n_steps_out):
+    x = []
+    y = []
+    for i in range(len(data)):
+        for j in range(len(data[i])):
+            end = j + n_steps_in
+            out_end = end + n_steps_out
+            if out_end > len(data[i]):
+                break
+            x.append(data[i][j:end])
+            y.append(data[i][end:out_end])
+    return np.array(x), np.array(y)
+
+def make_window_for_seq2seq_v3(data, n_steps_in, n_steps_out):
+    x = []
+    y = []
+    for i in range(len(data)):
+        country_data = data[i][14:]
+        for j in range(len(country_data)):
+            end = j*n_steps_out + n_steps_in
+            out_end = end + n_steps_out
+            if out_end > len(country_data):
+                break
+            x.append(country_data[j*n_steps_out:end])
+            y.append(country_data[end:out_end])
     return np.array(x), np.array(y)
 
 def save_countries_data(path,general_dataframe, countries, target_country):
